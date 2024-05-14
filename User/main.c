@@ -31,12 +31,14 @@ ESP8266_HTTP_SendSmsTypedef ESP8266_HTTP_SendSmsTypestructure; // ·¢ËÍ¶ÌĞÅAPI½á¹
 int16_t Num_flag;   // ·µ»ØµÄ±êÖ¾Î», 1ÎªµÍÎ»¼ì²âÓĞĞ§, 0Îª¸ßÎ»¼ì²âÓĞĞ§»òµÍÎ»¼ì²âÎŞĞ§
 uint16_t pm;        // PM2.5Å¨¶È
 int8_t Speed;       // µã»÷×ªËÙ(-100 ~ +100)
+uint8_t FanMode;    // ·çÉÈÄ£Ê½: 0: ¹Ø±Õ, 1: ´ò¿ª, 2: ×Ô¶¯
 
 // ±êÊ¶
 uint8_t mainProgramSuccessInit = 0;       // ÕûÌå³ÌĞòÊÇ·ñÍê³É³õÊ¼»¯
-uint8_t ESP8266GetThresholdSuccess = 0;   // ESP8266ÊÇ·ñ»ñÈ¡µ½ãĞÖµ(×´Ì¬)
-uint8_t ESP8266GetThreshold = 0;          // ESP8266ÊÇ·ñ»ñÈ¡ãĞÖµ(¶¯×÷)
-uint8_t ESP8266UpdateData = 0;            // ESP8266ÊÇ·ñÉÏ´«Êı¾İ(¶¯×÷)
+uint8_t ESP8266GetThresholdSuccess = 0;   // ESP8266ÊÇ·ñ»ñÈ¡ãĞÖµ(×´Ì¬)
+uint8_t ESP8266GetThreshold = 0;          // ESP8266»ñÈ¡ãĞÖµ(¶¯×÷)
+uint8_t ESP8266UpdateData = 0;            // ESP8266ÉÏ´«Êı¾İ(¶¯×÷)
+uint8_t ESP8266GetFanMode = 0;            // ESP8266»ñÈ¡·çÉÈÄ£Ê½(¶¯×÷)
 // ---- ¶¨ÒåÈ«¾Ö±äÁ¿ ----
 
 int main(void)
@@ -174,8 +176,8 @@ int main(void)
       // ÒÑ¾­»ñÈ¡µ½ãĞÖµ
       // ÅĞ¶ÏÊÇ·ñ³¬¹ıãĞÖµ
       alarmFlag = Utils_IsOverThreshold(&humi,&temp,&concentration);
-      Serial_Printf("ÎÂ¶ÈÊı¾İ: %d, %d, %d, %d\r\n", temp.Temp_H, temp.Temp_L, temp.Temp_H_Threshold, temp.Temp_L_Threshold);
-      Serial_Printf("alarmFlag: %d\r\n", alarmFlag);
+      // Serial_Printf("ÎÂ¶ÈÊı¾İ: %d, %d, %d, %d\r\n", temp.Temp_H, temp.Temp_L, temp.Temp_H_Threshold, temp.Temp_L_Threshold);
+      // Serial_Printf("alarmFlag: %d\r\n", alarmFlag);
       if(alarmFlag == 1)
       {
         // µ±Ç°ÎÂ¶È³¬¹ıãĞÖµ
@@ -204,8 +206,11 @@ int main(void)
         OLED_ShowNum(2,10,temp.Temp_L,1);   // ÎÂ¶È Ğ¡Êı²¿·Ö
 
         // ·çÉÈ×ª¶¯
-        Speed = Utils_GetPIDOutputSpeed(temp.Temp_H, temp.Temp_L, temp.Temp_H_Threshold, temp.Temp_L_Threshold);
-        Motor_SetSpeed(Speed);
+        if(FanMode == 2)
+        {
+          Speed = Utils_GetPIDOutputSpeed(temp.Temp_H, temp.Temp_L, temp.Temp_H_Threshold, temp.Temp_L_Threshold);
+          Motor_SetSpeed(Speed);
+        }
       }
       else if(alarmFlag == 2)
       {
@@ -305,6 +310,16 @@ int main(void)
       OLED_ShowNum(3,11,concentration.Concentration_H,3);   // Å¨¶È ÕûÊı²¿·Ö
       OLED_ShowNum(3,15,concentration.Concentration_L,1);   // Å¨¶È Ğ¡Êı²¿·Ö
     }
+    if(FanMode == 1)
+    {
+      // ´ò¿ª·çÉÈ
+      Motor_SetSpeed(50);
+    }
+    else if(FanMode == 0)
+    {
+      // ¹Ø±Õ·çÉÈ
+      Motor_SetSpeed(0);
+    }
     #endif
     // ---- ±¾µØÅĞ¶Ï(Ö÷³ÌĞò) ----
 
@@ -338,6 +353,32 @@ int main(void)
     #endif
     // ---- ESP8266ÉÏ´«ÎÂÊÒÅ¨¶ÈÊı¾İ ----
 
+    // ---- ESP8266»ñÈ¡·çÉÈÄ£Ê½ ----
+    if(ESP8266GetFanMode)
+    {
+      Serial_Printf("ESP8266 »ñÈ¡·çÉÈÄ£Ê½.\r\n");
+      char* res = ESP8266_HTTP_Get("/fixfanspeed?access=9mzdDx3K3pgmGdkTcq2ONsUKMp3VSTkIxoUwnHk7bljH4GrkYSeJXFtBp8HYN4f0DJAYPa", 100);
+      char* res_end;
+      do
+      {
+        res = ESP8266_GetBuffer();
+        res_end = strchr(res, '}');
+        Delay_ms(100);
+      }while(res_end == NULL);
+
+      // ½âÎöÊı¾İ
+      char *key_start = strstr(res, "msg");
+      char *result_start = strchr(key_start, ':') + 2;
+      char *result_end = result_start + 1;
+      char result[5];
+      strncpy(result, result_start, result_end - result_start);
+      FanMode = atoi(result);
+
+      // ¸üĞÂ±êÖ¾Î»
+      ESP8266GetFanMode = 0;
+    }
+    // ---- ESP8266»ñÈ¡·çÉÈÄ£Ê½ ----
+
     // ---- ºìÍâ ----
     #if use_infrared
     Num_flag = Sensor_Get();
@@ -366,6 +407,7 @@ void Mytiming_callback_3s(void)
 void Mytiming_callback_5s(void)
 {
   ESP8266GetThreshold = 1;  // »ñÈ¡ãĞÖµ
+  ESP8266GetFanMode = 1;    // »ñÈ¡·çÉÈÄ£Ê½
 }
 
 // ¼ÆÊ±ÓÃ¼ÆÊıÆ÷
