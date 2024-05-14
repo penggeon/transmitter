@@ -1,6 +1,11 @@
 #ifndef __GP2Y_H
 #define __GP2Y_H
 
+#include "stm32f10x.h"
+#include "Delay.h"
+#include "adc.h"
+#include "Serial.h"
+
 #define gp2y_GPIO GPIOA
 #define gp2y_GPIO_PIN GPIO_Pin_6
 #define gp2y_on GPIO_SetBits(GPIOA,gp2y_GPIO_PIN)

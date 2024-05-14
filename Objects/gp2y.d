@@ -1,4 +1,5 @@
 .\objects\gp2y.o: Hardware\gp2y.c
+.\objects\gp2y.o: Hardware\gp2y.h
 .\objects\gp2y.o: .\Start\stm32f10x.h
 .\objects\gp2y.o: .\Start\core_cm3.h
 .\objects\gp2y.o: D:\software\develop\keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
@@ -30,6 +31,5 @@
 .\objects\gp2y.o: .\Library\misc.h
 .\objects\gp2y.o: .\System\Delay.h
 .\objects\gp2y.o: Hardware\adc.h
-.\objects\gp2y.o: Hardware\gp2y.h
 .\objects\gp2y.o: Hardware\Serial.h
 .\objects\gp2y.o: D:\software\develop\keil_v5\ARM\ARMCC\Bin\..\include\stdio.h

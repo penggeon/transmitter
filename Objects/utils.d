@@ -33,3 +33,4 @@
 .\objects\utils.o: D:\software\develop\keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
 .\objects\utils.o: D:\software\develop\keil_v5\ARM\ARMCC\Bin\..\include\string.h
 .\objects\utils.o: D:\software\develop\keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+.\objects\utils.o: Hardware\Serial.h

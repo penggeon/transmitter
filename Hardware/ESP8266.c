@@ -58,12 +58,12 @@ void ESP8266_SendString(char *string)
 */
 void ESP8266_Printf(char *format, ...)
 {
-	char String[1024];				//定义字符数组
-	va_list arg;					//定义可变参数列表数据类型的变量arg
-	va_start(arg, format);			//从format开始，接收参数列表到arg变量
-	vsprintf(String, format, arg);	//使用vsprintf打印格式化字符串和参数列表到字符数组中
-	va_end(arg);					//结束变量arg
-	ESP8266_SendString(String);		//串口发送字符数组（字符串）
+	char String[1024];      //定义字符数组
+	va_list arg;            //定义可变参数列表数据类型的变量arg
+	va_start(arg, format);  //从format开始，接收参数列表到arg变量
+	vsprintf(String, format, arg);    //使用vsprintf打印格式化字符串和参数列表到字符数组中
+	va_end(arg);                      //结束变量arg
+	ESP8266_SendString(String);       //串口发送字符数组（字符串）
 }
 
 /**
@@ -222,7 +222,7 @@ char* ESP8266_HTTP_Get(char* address, uint8_t timeout)
   }
   
   return "HTTP Send Failed.";
-}
+}  
 
 /**
  * @brief  HTTP请求更新机房环境数据
@@ -235,12 +235,14 @@ char* ESP8266_HTTPPostData(ESP8266_HTTP_PostDataTypedef* ESP8266_HTTP_PostDataTy
   char data[1000];  // 请求数据
   ESP8266_HTTP_PostDataTypestructure->address = "/thcp"; // 地址
   ESP8266_HTTP_PostDataTypestructure->accessToken = "9mzdDx3K3pgmGdkTcq2ONsUKMp3VSTkIxoUwnHk7bljH4GrkYSeJXFtBp8HYN4f0DJAYPa";
-  sprintf(data, "access-token=%s&temperature=%d.%d&humidity=%d.%d&concentration=%d.%d", ESP8266_HTTP_PostDataTypestructure->accessToken, ESP8266_HTTP_PostDataTypestructure->temperature_H, ESP8266_HTTP_PostDataTypestructure->temperature_L, ESP8266_HTTP_PostDataTypestructure->humidity_H, ESP8266_HTTP_PostDataTypestructure->humidity_L, ESP8266_HTTP_PostDataTypestructure->concentration_H, ESP8266_HTTP_PostDataTypestructure->concentration_L);
+  sprintf(data, "access=%s&temperature=%d.%d&humidity=%d.%d&concentration=%d.%d", ESP8266_HTTP_PostDataTypestructure->accessToken, ESP8266_HTTP_PostDataTypestructure->temperature_H, ESP8266_HTTP_PostDataTypestructure->temperature_L, ESP8266_HTTP_PostDataTypestructure->humidity_H, ESP8266_HTTP_PostDataTypestructure->humidity_L, ESP8266_HTTP_PostDataTypestructure->concentration_H, ESP8266_HTTP_PostDataTypestructure->concentration_L);
+  // Serial_Printf("data:%s\n", data);
   uint32_t dataLength = strlen(data);
 
   // 发送数据
   ESP8266_ClearBuffer();
   ESP8266_Printf("POST %s HTTP/1.1\r\nContent-Length:%d\r\nContent-Type:application/x-www-form-urlencoded;charset=UTF-8\r\n\r\n%s\r\n\r\n", ESP8266_HTTP_PostDataTypestructure->address, dataLength, data);
+  // Serial_Printf("POST %s HTTP/1.1\r\nContent-Length:%d\r\nContent-Type:application/x-www-form-urlencoded;charset=UTF-8\r\n\r\n%s\r\n\r\n", ESP8266_HTTP_PostDataTypestructure->address, dataLength, data);
   while(ESP8266_HTTP_PostDataTypestructure->timeout--)
   {
     Delay_ms(100);
@@ -287,12 +289,7 @@ char* ESP8266_HTTPSendSms(ESP8266_HTTP_SendSmsTypedef* ESP8266_HTTP_SendSmsTypes
  */
 static void ESP8266_FrameFinish_CallBack(void) {
   #if debug_mode
-  if(ESP8266_Buffer.FinishFlag)
-  {
-    // Serial_Printf("\r\n中断回调函数串口输出:\r\n%s", ESP8266_Buffer.Body);
-    Serial_SendString(ESP8266_Buffer.Body);
-    ESP8266_Buffer.FinishFlag = 0;
-  }
+  Serial_Printf("\r\n中断回调函数串口输出:\r\n%s", ESP8266_Buffer.Body);
 	#endif
 }
 

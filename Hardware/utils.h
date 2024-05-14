@@ -23,7 +23,10 @@ typedef struct {
 
 uint8_t Utils_IsOverThreshold(Humidity_Typedef* Humi, Temperature_Typedef* Temp, Concentration_Typedef* Concentration);
 void Utils_ShowWelcomeMessage(void);
-void Utils_GetInformationFromResJson_8(char* res_json, char* name, uint8_t* integer_part, uint8_t* decimal_part);
-void Utils_GetInformationFromResJson_16(char* res_json, char* name, uint16_t* integer_part, uint16_t* decimal_part);
+void Utils_GetInformationOfThreshold_8(char* res, char* name, uint8_t* integer_part, uint8_t* decimal_part);
+void Utils_GetInformationOfThreshold_16(char* res, char* name, uint16_t* integer_part, uint16_t* decimal_part);
+void Utils_GetInformationOfThcp_8(char *res, char *name, uint8_t *integer_part, uint8_t *decimal_part);
+void Utils_GetInformationOfThcp_16(char *res, char *name, uint16_t *integer_part, uint16_t *decimal_part);
+int8_t Utils_GetPIDOutputSpeed(uint8_t temperature_H, uint8_t temperature_L, uint8_t temperature_H_Threshold, uint8_t temperature_L_Threshold);
 
 #endif

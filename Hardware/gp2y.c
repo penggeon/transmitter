@@ -1,8 +1,4 @@
-#include "stm32f10x.h"
-#include "Delay.h"
-#include "adc.h"
 #include "gp2y.h"
-#include "Serial.h"
 
 /**
  * @brief  GP2Y1014AU≥ı ºªØ

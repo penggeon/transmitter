@@ -54,9 +54,9 @@ void Sensor_Init(void)
 	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;	//指定NVIC线路的抢占优先级为1
 	NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;			//指定NVIC线路的响应优先级为2
 	NVIC_Init(&NVIC_InitStructure);								//将结构体变量交给NVIC_Init，配置NVIC外设
-	
+
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE); //开启TIM3的时钟
-    
+
 	TIM_TimeBaseInitTypeDef TIM_InitStructure;
 	TIM_InitStructure.TIM_Prescaler = (SystemCoreClock / 1000) - 1; // 定时器时钟频率为1kHz
 	TIM_InitStructure.TIM_Period = 1; // 定时周期为1ms
@@ -74,6 +74,8 @@ void Sensor_Init(void)
 	NVIC_Init(&NVIC_InitStructure);
 	
 	TIM_Cmd(TIM3, ENABLE);
+
+  Adc_Init(); // ADC初始化
 }
 
 
